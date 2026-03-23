@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocPix Studio — The Free Alternative to Expensive Editing Tools</title>
+  <meta name="description" content="Edit PDFs, images, and documents in one place. No subscriptions. No complexity. Powered by AI. Free forever.">
+  <meta name="keywords" content="free PDF editor, Photoshop alternative, AI image editing, document editor, PDF converter, free document signing">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-glass: rgba(255,255,255,0.06);
+      --border-glass: rgba(255,255,255,0.08);
+      --text: #f0f0f5;
+      --text-secondary: #9090a8;
+      --primary: #3b82f6;
+      --primary-light: #60a5fa;
+      --primary-glow: rgba(59,130,246,0.25);
+      --accent: #818cf8;
+      --accent-glow: rgba(129,140,248,0.2);
+      --gradient-1: linear-gradient(135deg, #3b82f6, #818cf8);
+      --gradient-2: linear-gradient(135deg, #6366f1, #a78bfa);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --radius-xs: 8px;
+      --shadow-glass: 0 8px 32px rgba(0,0,0,0.3);
+      --shadow-glow: 0 0 60px rgba(59,130,246,0.15);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== ANIMATED BACKGROUND ===== */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(129,140,248,0.08), transparent);
+      pointer-events: none;
+    }
+    .bg-grid::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
+    }
+
+    .floating-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      animation: orbFloat 20s ease-in-out infinite;
+    }
+    .orb-1 { width: 400px; height: 400px; background: rgba(59,130,246,0.08); top: 10%; left: -5%; animation-delay: 0s; }
+    .orb-2 { width: 350px; height: 350px; background: rgba(129,140,248,0.06); bottom: 20%; right: -5%; animation-delay: -7s; }
+    .orb-3 { width: 300px; height: 300px; background: rgba(99,102,241,0.05); top: 50%; left: 40%; animation-delay: -14s; }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    /* ===== NAVIGATION ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      background: rgba(10,10,15,0.7);
+      border-bottom: 1px solid var(--border-glass);
+      transition: all 0.3s;
+    }
+    nav.scrolled {
+      padding: 12px 40px;
+      background: rgba(10,10,15,0.85);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 36px;
+      height: 36px;
+    }
+    .nav-logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .nav-logo-text span { color: var(--primary-light); }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-1);
+      border-radius: 1px;
+      transition: width 0.3s;
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      background: var(--gradient-1) !important;
+      color: white !important;
+      padding: 8px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px var(--primary-glow);
+    }
+    .nav-cta::after { display: none !important; }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* ===== SECTIONS ===== */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 120px 40px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 100px;
+    }
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--primary-light);
+      font-weight: 500;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+    .hero h1 {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .hero h1 .gradient-text {
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 500px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+      cursor: pointer;
+      border: none;
+      font-family: var(--font);
+    }
+    .btn-primary {
+      background: var(--gradient-1);
+      color: white;
+      box-shadow: 0 4px 24px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(59,130,246,0.35);
+    }
+    .btn-primary:active { transform: translateY(0) scale(0.98); }
+    .btn-secondary {
+      background: var(--bg-glass);
+      color: var(--text);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(10px);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Product Mockup */
+    .hero-visual {
+      position: relative;
+    }
+    .mockup-container {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-glass), var(--shadow-glow);
+      animation: mockupFloat 6s ease-in-out infinite;
+    }
+    @keyframes mockupFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .mockup-topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .mockup-dot.red { background: #ff5f57; }
+    .mockup-dot.yellow { background: #ffbd2e; }
+    .mockup-dot.green { background: #28ca41; }
+    .mockup-body {
+      padding: 24px;
+      min-height: 320px;
+      display: flex;
+      gap: 16px;
+    }
+    .mockup-sidebar {
+      width: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      padding-top: 8px;
+    }
+    .mockup-tool {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: default;
+      transition: all 0.2s;
+    }
+    .mockup-tool:hover {
+      background: var(--primary-glow);
+      transform: scale(1.1);
+    }
+    .mockup-tool.active { background: var(--gradient-1); }
+    .mockup-canvas {
+      flex: 1;
+      background: rgba(255,255,255,0.02);
+      border-radius: var(--radius-xs);
+      border: 1px solid rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .mockup-page {
+      position: absolute;
+      inset: 12px;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      padding: 20px;
+    }
+    .mockup-line {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .mockup-line:nth-child(1) { width: 70%; }
+    .mockup-line:nth-child(2) { width: 90%; }
+    .mockup-line:nth-child(3) { width: 55%; }
+    .mockup-line:nth-child(4) { width: 80%; margin-top: 20px; }
+    .mockup-line:nth-child(5) { width: 65%; }
+    .mockup-line:nth-child(6) { width: 85%; }
+    .mockup-line.highlight {
+      background: rgba(59,130,246,0.2);
+      border: 1px solid rgba(59,130,246,0.4);
+    }
+    .mockup-stamp {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      padding: 8px 16px;
+      border: 2px solid #dc2626;
+      border-radius: 6px;
+      color: #dc2626;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 1px;
+      transform: rotate(-12deg);
+      opacity: 0.8;
+    }
+    .mockup-signature {
+      position: absolute;
+      bottom: 70px;
+      right: 30px;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-size: 18px;
+      color: #1e40af;
+      opacity: 0.7;
+    }
+
+    /* Floating badges around hero */
+    .hero-float {
+      position: absolute;
+      padding: 10px 18px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      backdrop-filter: blur(20px);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      box-shadow: var(--shadow-glass);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: float 4s ease-in-out infinite;
+    }
+    .hero-float.f1 { top: 10%; right: -20px; animation-delay: 0s; }
+    .hero-float.f2 { bottom: 15%; left: -30px; animation-delay: -1.5s; }
+    .hero-float.f3 { top: 55%; right: -40px; animation-delay: -3s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* ===== LOGOS / TRUST BAR ===== */
+    .trust-bar {
+      text-align: center;
+      padding: 60px 40px;
+    }
+    .trust-bar p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+    }
+    .trust-logos {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      align-items: center;
+      opacity: 0.4;
+    }
+    .trust-logos span {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    /* ===== PHILOSOPHY SECTION ===== */
+    .philosophy {
+      text-align: center;
+    }
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 100px;
+      font-size: 12px;
+      color: var(--primary-light);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-subtitle {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 60px;
+      line-height: 1.7;
+    }
+
+    /* ===== BENTO GRID ===== */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      gap: 16px;
+    }
+    .bento-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+      padding: 32px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(59,130,246,0.06), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .bento-card:hover::before { opacity: 1; }
+    .bento-card:hover {
+      border-color: rgba(59,130,246,0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    }
+    .bento-card.large { grid-column: span 2; }
+    .bento-card.tall { grid-row: span 2; }
+    .bento-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--gradient-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+    .bento-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .bento-card p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Feature visual inside bento */
+    .bento-visual {
+      margin-top: 20px;
+      border-radius: var(--radius-xs);
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 16px;
+      position: relative;
+    }
+
+    /* ===== PRODUCT SECTION ===== */
+    .product-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      margin-bottom: 120px;
+    }
+    .product-features.reverse { direction: rtl; }
+    .product-features.reverse > * { direction: ltr; }
+    .feature-content h3 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .feature-content p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+    .feature-list li .check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--primary-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      color: var(--primary-light);
+    }
+    .feature-visual {
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-glass);
+      position: relative;
+    }
+    .feature-screen {
+      padding: 20px;
+      min-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* AI Visual */
+    .ai-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+    .ai-prompt-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ai-prompt-box .sparkle { font-size: 20px; }
+    .ai-prompt-box span {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .ai-prompt-box .cursor-blink {
+      display: inline-block;
+      width: 2px;
+      height: 16px;
+      background: var(--primary-light);
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .ai-result-card {
+      background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(129,140,248,0.08));
+      border: 1px solid rgba(59,130,246,0.15);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+    }
+    .ai-result-card p {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Convert Visual */
+    .convert-visual {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      justify-content: center;
+    }
+    .file-icon {
+      width: 80px;
+      height: 100px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      gap: 6px;
+      border: 1px solid var(--border-glass);
+    }
+    .file-icon.pdf { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.2); }
+    .file-icon.docx { background: rgba(59,130,246,0.12); color: #60a5fa; border-color: rgba(59,130,246,0.2); }
+    .file-icon.jpg { background: rgba(34,197,94,0.12); color: #4ade80; border-color: rgba(34,197,94,0.2); }
+    .file-icon .icon-big { font-size: 28px; }
+    .arrow-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .arrow-flow .arrow-line {
+      width: 40px;
+      height: 2px;
+      background: var(--gradient-1);
+      border-radius: 1px;
+    }
+    .arrow-flow .arrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Sign Visual */
+    .sign-visual {
+      text-align: center;
+    }
+    .sign-doc {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      width: 80%;
+      margin: 0 auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .sign-doc .doc-line {
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      margin-bottom: 8px;
+    }
+    .sign-doc .doc-line:nth-child(1) { width: 60%; }
+    .sign-doc .doc-line:nth-child(2) { width: 85%; }
+    .sign-doc .doc-line:nth-child(3) { width: 70%; }
+    .sign-area {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px dashed #d1d5db;
+    }
+    .sign-area .sig-text {
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-size: 22px;
+      color: #1e40af;
+    }
+    .sign-area .sig-label {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ===== PRICING / IMPACT ===== */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .price-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+      padding: 40px 32px;
+      text-align: center;
+      transition: all 0.3s;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+    .price-card.featured {
+      border-color: rgba(59,130,246,0.3);
+      background: linear-gradient(180deg, rgba(59,130,246,0.08), var(--bg-card));
+    }
+    .price-card.featured::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-1);
+    }
+    .price-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+    }
+    .price-card .price-label {
+      font-size: 14px;
+      color: var(--primary-light);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .price-card .price-amount {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .price-card .price-period {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+    .price-card .price-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+    .price-card .price-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .price-card .price-features li .pf-check {
+      color: #22c55e;
+      font-size: 16px;
+    }
+
+    /* ===== IMPACT SECTION ===== */
+    .impact-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .impact-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+      transition: all 0.3s;
+      backdrop-filter: blur(20px);
+    }
+    .impact-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59,130,246,0.2);
+    }
+    .impact-card .impact-emoji {
+      font-size: 36px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .impact-card h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .impact-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ===== QUOTE BLOCK ===== */
+    .quote-block {
+      text-align: center;
+      padding: 80px 40px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .quote-block blockquote {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.4;
+      color: var(--text);
+      position: relative;
+    }
+    .quote-block blockquote .q-highlight {
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ===== SEO SECTION ===== */
+    .seo-section {
+      background: linear-gradient(180deg, rgba(59,130,246,0.04), transparent);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-glass);
+      padding: 60px;
+      text-align: center;
+    }
+    .seo-section h3 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .seo-section p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+    .seo-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .seo-tag {
+      padding: 8px 20px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ===== CONTACT ===== */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+    .contact-info h3 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .contact-info p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .contact-detail {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .contact-detail .cd-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .contact-detail span {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+    .contact-form {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+      padding: 40px;
+      backdrop-filter: blur(20px);
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xs);
+      color: var(--text);
+      font-size: 15px;
+      font-family: var(--font);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 60px 40px 30px;
+      border-top: 1px solid var(--border-glass);
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy {
+      text-align: center;
+      padding-top: 30px;
+      margin-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-secondary);
+      font-size: 13px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ===== SCROLL REVEAL ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .hero-content { grid-template-columns: 1fr; gap: 40px; }
+      .hero-visual { order: -1; }
+      .hero-float { display: none; }
+      .product-features { grid-template-columns: 1fr; gap: 40px; }
+      .product-features.reverse { direction: ltr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+      .impact-cards { grid-template-columns: repeat(2, 1fr); }
+      .contact-grid { grid-template-columns: 1fr; }
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-card.large { grid-column: span 1; }
+    }
+    @media (max-width: 768px) {
+      section { padding: 80px 20px; }
+      nav { padding: 12px 20px; }
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: block; }
+      .hero { min-height: auto; padding-top: 120px; padding-bottom: 60px; }
+      .mockup-body { min-height: 240px; }
+      .seo-section { padding: 40px 24px; }
+      .impact-cards { grid-template-columns: 1fr; }
+    }
+
+    /* ===== CLAY BUTTON SQUISH ===== */
+    .btn:active {
+      animation: squish 0.2s ease-out;
+    }
+    @keyframes squish {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.94, 1.06); }
+      100% { transform: scale(1); }
+    }
+
+    /* ===== CUSTOM SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+  </style>
+</head>
+<body>
+
+  <!-- Animated BG -->
+  <div class="bg-grid"></div>
+  <div class="floating-orb orb-1"></div>
+  <div class="floating-orb orb-2"></div>
+  <div class="floating-orb orb-3"></div>
+
+  <!-- ===== NAV ===== -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 40 40" fill="none">
+        <rect x="2" y="2" width="36" height="36" rx="10" fill="url(#logo-grad)" />
+        <rect x="2" y="2" width="18" height="36" rx="10" fill="white" />
+        <line x1="8" y1="16" x2="16" y2="16" stroke="#4a5568" stroke-width="2" stroke-linecap="round"/>
+        <line x1="8" y1="22" x2="14" y2="22" stroke="#4a5568" stroke-width="2" stroke-linecap="round"/>
+        <polygon points="26,28 32,18 38,28" fill="rgba(255,255,255,0.9)" />
+        <polygon points="22,28 28,20 34,28" fill="rgba(255,255,255,0.6)" />
+        <path d="M30 10 L31 13 L34 13 L31.5 15 L32.5 18 L30 16 L27.5 18 L28.5 15 L26 13 L29 13 Z" fill="white" />
+        <defs><linearGradient id="logo-grad" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
+      </svg>
+      <div class="nav-logo-text">DocPix <span>Studio</span></div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#product">Product</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="https://vagishkapila.github.io/openpdf-studio/" class="nav-cta">Launch App</a></li>
+    </ul>
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">&#9776;</button>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="home">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-badge">
+            <span class="dot"></span>
+            Free &amp; Open Source
+          </div>
+          <h1>
+            The free alternative to<br>
+            <span class="gradient-text">expensive editing tools.</span>
+          </h1>
+          <p class="hero-subtitle">
+            Edit PDFs, images, and everything in one place.
+            No subscriptions. No complexity. Just works.
+          </p>
+          <div class="hero-actions">
+            <a href="https://vagishkapila.github.io/openpdf-studio/" class="btn btn-primary">
+              <span>&#9889;</span> Start Editing — Free
+            </a>
+            <a href="#features" class="btn btn-secondary">
+              See Features
+            </a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="mockup-container">
+            <div class="mockup-topbar">
+              <div class="mockup-dot red"></div>
+              <div class="mockup-dot yellow"></div>
+              <div class="mockup-dot green"></div>
+              <span style="margin-left:auto;font-size:12px;color:#888">DocPix Studio</span>
+            </div>
+            <div class="mockup-body">
+              <div class="mockup-sidebar">
+                <div class="mockup-tool active">&#9997;</div>
+                <div class="mockup-tool">&#128196;</div>
+                <div class="mockup-tool">&#128444;</div>
+                <div class="mockup-tool">&#10004;</div>
+                <div class="mockup-tool">&#128270;</div>
+                <div class="mockup-tool">&#128295;</div>
+              </div>
+              <div class="mockup-canvas">
+                <div class="mockup-page">
+                  <div class="mockup-line" style="width:45%;height:12px;background:#1e293b;margin-bottom:14px"></div>
+                  <div class="mockup-line"></div>
+                  <div class="mockup-line"></div>
+                  <div class="mockup-line highlight"></div>
+                  <div class="mockup-line"></div>
+                  <div class="mockup-line"></div>
+                  <div class="mockup-line" style="width:40%"></div>
+                  <div class="mockup-signature">V. Kapila</div>
+                  <div class="mockup-stamp">APPROVED</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-float f1">&#128640; AI-Powered</div>
+          <div class="hero-float f2">&#128274; Secure &amp; Private</div>
+          <div class="hero-float f3">&#9889; Instant Results</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRUST BAR ===== -->
+  <div class="trust-bar reveal">
+    <p>Built for everyone who's tired of paying for tools they barely use</p>
+    <div class="trust-logos">
+      <span>Students</span>
+      <span>&bull;</span>
+      <span>Professionals</span>
+      <span>&bull;</span>
+      <span>Creators</span>
+      <span>&bull;</span>
+      <span>Small Businesses</span>
+      <span>&bull;</span>
+      <span>Freelancers</span>
+    </div>
+  </div>
+
+  <!-- ===== PHILOSOPHY ===== -->
+  <section class="philosophy" id="about">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">&#128161; Our Philosophy</div>
+        <h2 class="section-title">Most people don't need complex,<br>expensive software just to edit a file.</h2>
+        <p class="section-subtitle">
+          DocPix Studio is built for real use — fast, simple, and powered by AI.
+          No bloated features. No steep learning curve. Just the tools you actually use.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES BENTO ===== -->
+  <section id="features">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:60px">
+        <div class="section-label">&#9889; Features</div>
+        <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-card large reveal reveal-delay-1">
+          <div class="bento-icon">&#128196;</div>
+          <h3>Edit Documents Instantly</h3>
+          <p>Modify text, images, and layouts directly in your PDFs. Merge, split, reorder pages — all in the browser.</p>
+          <div class="bento-visual">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+              <div style="width:24px;height:24px;border-radius:6px;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:12px">T</div>
+              <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;flex:1"></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <div style="width:60%;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.05)">
+                <div style="height:4px;width:80%;background:rgba(255,255,255,0.08);border-radius:2px;margin-bottom:6px"></div>
+                <div style="height:4px;width:60%;background:rgba(255,255,255,0.08);border-radius:2px;margin-bottom:6px"></div>
+                <div style="height:4px;width:70%;background:rgba(59,130,246,0.2);border-radius:2px;border:1px solid rgba(59,130,246,0.3)"></div>
+              </div>
+              <div style="width:40%;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.05)">
+                <div style="width:100%;height:60px;background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(129,140,248,0.1));border-radius:6px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card reveal reveal-delay-2">
+          <div class="bento-icon" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa)">&#10024;</div>
+          <h3>AI Image Editing</h3>
+          <p>Remove backgrounds, enhance images, and make quick edits without learning complex tools.</p>
+        </div>
+
+        <div class="bento-card reveal reveal-delay-3">
+          <div class="bento-icon" style="background:linear-gradient(135deg,#22c55e,#4ade80)">&#128260;</div>
+          <h3>Convert &amp; Compress</h3>
+          <p>Convert PDF to Word, images, or text. Reduce file sizes instantly. Optimize for sharing.</p>
+        </div>
+
+        <div class="bento-card reveal reveal-delay-1">
+          <div class="bento-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">&#9998;</div>
+          <h3>Sign Documents</h3>
+          <p>Add signatures, finalize agreements, share instantly. No printing required.</p>
+        </div>
+
+        <div class="bento-card large reveal reveal-delay-2">
+          <div class="bento-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6)">&#127912;</div>
+          <h3>All In One Place</h3>
+          <p>Stop switching between apps. DocPix Studio combines document editing, image editing, and AI tools into one experience. No downloads, no complexity, no unnecessary features.</p>
+          <div class="bento-visual" style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="flex:1;min-width:80px;padding:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;text-align:center;font-size:12px;color:#f87171">PDF</div>
+            <div style="flex:1;min-width:80px;padding:10px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:8px;text-align:center;font-size:12px;color:#60a5fa">DOCX</div>
+            <div style="flex:1;min-width:80px;padding:10px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15);border-radius:8px;text-align:center;font-size:12px;color:#4ade80">Images</div>
+            <div style="flex:1;min-width:80px;padding:10px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.15);border-radius:8px;text-align:center;font-size:12px;color:#c084fc">AI</div>
+            <div style="flex:1;min-width:80px;padding:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);border-radius:8px;text-align:center;font-size:12px;color:#fbbf24">Sign</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRODUCT DEEP DIVE ===== -->
+  <section id="product">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:80px">
+        <div class="section-label">&#128736; Product</div>
+        <h2 class="section-title">See it in action.</h2>
+        <p class="section-subtitle">DocPix Studio combines document editing, image editing, and AI-powered tools into one simple experience.</p>
+      </div>
+
+      <!-- PDF Editing -->
+      <div class="product-features reveal">
+        <div class="feature-content">
+          <h3>Edit PDFs easily</h3>
+          <p>No more printing, scanning, or fighting with clunky software. Click, edit, done.</p>
+          <ul class="feature-list">
+            <li><span class="check">&#10003;</span> Modify text and images directly</li>
+            <li><span class="check">&#10003;</span> Merge, split, and reorder pages</li>
+            <li><span class="check">&#10003;</span> Fill and edit forms instantly</li>
+            <li><span class="check">&#10003;</span> Add annotations, stamps, watermarks</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div class="mockup-topbar">
+            <div class="mockup-dot red"></div>
+            <div class="mockup-dot yellow"></div>
+            <div class="mockup-dot green"></div>
+          </div>
+          <div class="feature-screen">
+            <div style="width:70%;background:white;border-radius:6px;padding:20px;box-shadow:0 2px 16px rgba(0,0,0,0.15)">
+              <div style="height:10px;width:50%;background:#1e293b;border-radius:4px;margin-bottom:10px"></div>
+              <div style="height:6px;width:90%;background:#e5e7eb;border-radius:3px;margin-bottom:6px"></div>
+              <div style="height:6px;width:75%;background:#e5e7eb;border-radius:3px;margin-bottom:6px"></div>
+              <div style="height:6px;width:85%;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);border-radius:3px;margin-bottom:6px;position:relative">
+                <div style="position:absolute;right:-8px;top:-4px;width:14px;height:14px;background:#3b82f6;border-radius:3px;border:2px solid white"></div>
+              </div>
+              <div style="height:6px;width:60%;background:#e5e7eb;border-radius:3px;margin-bottom:16px"></div>
+              <div style="display:flex;gap:8px">
+                <div style="flex:1;height:50px;background:#f3f4f6;border-radius:4px"></div>
+                <div style="flex:1;height:50px;background:#f3f4f6;border-radius:4px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Image Editing -->
+      <div class="product-features reverse reveal">
+        <div class="feature-content">
+          <h3>AI image editing</h3>
+          <p>Professional-quality edits without the learning curve. Just describe what you want.</p>
+          <ul class="feature-list">
+            <li><span class="check">&#10003;</span> Remove backgrounds instantly</li>
+            <li><span class="check">&#10003;</span> Enhance and upscale images</li>
+            <li><span class="check">&#10003;</span> Quick edits with natural language</li>
+            <li><span class="check">&#10003;</span> No Photoshop skills required</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div class="mockup-topbar">
+            <div class="mockup-dot red"></div>
+            <div class="mockup-dot yellow"></div>
+            <div class="mockup-dot green"></div>
+          </div>
+          <div class="feature-screen">
+            <div class="ai-visual">
+              <div class="ai-prompt-box">
+                <span class="sparkle">&#10024;</span>
+                <span>Remove background and enhance...</span>
+                <span class="cursor-blink"></span>
+              </div>
+              <div class="ai-result-card">
+                <p style="color:white;margin-bottom:8px;font-weight:600;font-size:12px">&#10024; AI Result</p>
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div style="width:80px;height:80px;border-radius:8px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:flex;align-items:center;justify-content:center;font-size:28px">&#128444;</div>
+                  <div>
+                    <div style="font-size:13px;color:#a5b4fc;margin-bottom:4px">Background removed</div>
+                    <div style="font-size:13px;color:#a5b4fc;margin-bottom:4px">Enhanced +45%</div>
+                    <div style="font-size:13px;color:#22c55e">&#10003; Ready to download</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Convert & Compress -->
+      <div class="product-features reveal">
+        <div class="feature-content">
+          <h3>Convert and compress files</h3>
+          <p>Transform files between formats instantly. Shrink sizes without losing quality.</p>
+          <ul class="feature-list">
+            <li><span class="check">&#10003;</span> PDF to Word, images, or text</li>
+            <li><span class="check">&#10003;</span> Reduce file sizes by up to 80%</li>
+            <li><span class="check">&#10003;</span> Optimize files for email and sharing</li>
+            <li><span class="check">&#10003;</span> Batch processing support</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div class="mockup-topbar">
+            <div class="mockup-dot red"></div>
+            <div class="mockup-dot yellow"></div>
+            <div class="mockup-dot green"></div>
+          </div>
+          <div class="feature-screen">
+            <div class="convert-visual">
+              <div class="file-icon pdf">
+                <span class="icon-big">&#128196;</span>
+                PDF
+              </div>
+              <div class="arrow-flow">
+                <div class="arrow-line"></div>
+                <div class="arrow-dot"></div>
+                <div class="arrow-line"></div>
+              </div>
+              <div class="file-icon docx">
+                <span class="icon-big">&#128462;</span>
+                DOCX
+              </div>
+              <div class="arrow-flow">
+                <div class="arrow-line"></div>
+                <div class="arrow-dot"></div>
+                <div class="arrow-line"></div>
+              </div>
+              <div class="file-icon jpg">
+                <span class="icon-big">&#128444;</span>
+                JPG
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sign Documents -->
+      <div class="product-features reverse reveal">
+        <div class="feature-content">
+          <h3>Sign documents</h3>
+          <p>Add your signature, finalize agreements, and share instantly. Paperless workflow made simple.</p>
+          <ul class="feature-list">
+            <li><span class="check">&#10003;</span> Draw or type your signature</li>
+            <li><span class="check">&#10003;</span> Place stamps and approvals</li>
+            <li><span class="check">&#10003;</span> Finalize and share instantly</li>
+            <li><span class="check">&#10003;</span> No account required</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div class="mockup-topbar">
+            <div class="mockup-dot red"></div>
+            <div class="mockup-dot yellow"></div>
+            <div class="mockup-dot green"></div>
+          </div>
+          <div class="feature-screen">
+            <div class="sign-visual">
+              <div class="sign-doc">
+                <div class="doc-line"></div>
+                <div class="doc-line"></div>
+                <div class="doc-line"></div>
+                <div class="sign-area">
+                  <div class="sig-text">Vagish Kapila</div>
+                  <div class="sig-label">Signed electronically</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QUOTE ===== -->
+  <div class="quote-block reveal">
+    <blockquote>
+      Most tools are built for professionals.<br>
+      <span class="q-highlight">DocPix is built for everyone.</span>
+    </blockquote>
+  </div>
+
+  <!-- ===== PRICING ===== -->
+  <section id="pricing">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:60px">
+        <div class="section-label">&#128176; Pricing</div>
+        <h2 class="section-title">This tool is free.</h2>
+        <p class="section-subtitle">
+          Everything is included — no limits, no hidden restrictions.
+          If you'd like to support us, you can. But you don't have to.
+        </p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="price-card reveal reveal-delay-1">
+          <div class="price-label">Free Forever</div>
+          <div class="price-amount">$0</div>
+          <div class="price-period">No credit card needed</div>
+          <ul class="price-features">
+            <li><span class="pf-check">&#10003;</span> PDF editing</li>
+            <li><span class="pf-check">&#10003;</span> Image editing</li>
+            <li><span class="pf-check">&#10003;</span> AI tools</li>
+            <li><span class="pf-check">&#10003;</span> File conversion</li>
+            <li><span class="pf-check">&#10003;</span> Document signing</li>
+            <li><span class="pf-check">&#10003;</span> No limits</li>
+          </ul>
+          <a href="https://vagishkapila.github.io/openpdf-studio/" class="btn btn-primary" style="width:100%;justify-content:center">Start Free</a>
+        </div>
+
+        <div class="price-card featured reveal reveal-delay-2">
+          <div class="price-label">Supporter</div>
+          <div class="price-amount">$5</div>
+          <div class="price-period">per month &middot; or $60/year</div>
+          <ul class="price-features">
+            <li><span class="pf-check">&#10003;</span> Everything in Free</li>
+            <li><span class="pf-check">&#10003;</span> Help cover hosting &amp; AI</li>
+            <li><span class="pf-check">&#10003;</span> Support ongoing development</li>
+            <li><span class="pf-check">&#10003;</span> Early access to new features</li>
+            <li><span class="pf-check">&#10003;</span> Supporter badge</li>
+            <li><span class="pf-check">&#10003;</span> Feel amazing</li>
+          </ul>
+          <a href="#contact" class="btn btn-primary" style="width:100%;justify-content:center">Support Us</a>
+        </div>
+
+        <div class="price-card reveal reveal-delay-3">
+          <div class="price-label">Make an Impact</div>
+          <div class="price-amount">$60</div>
+          <div class="price-period">one-time &middot; your way</div>
+          <ul class="price-features">
+            <li><span class="pf-check">&#10003;</span> Feed someone in need</li>
+            <li><span class="pf-check">&#10003;</span> Support cancer research</li>
+            <li><span class="pf-check">&#10003;</span> Sponsor a child</li>
+            <li><span class="pf-check">&#10003;</span> Help a family</li>
+            <li><span class="pf-check">&#10003;</span> We can route it for you</li>
+            <li><span class="pf-check">&#10003;</span> Same amount. Real impact.</li>
+          </ul>
+          <a href="#impact" class="btn btn-secondary" style="width:100%;justify-content:center">Learn More</a>
+        </div>
+      </div>
+
+      <div class="reveal" style="text-align:center;margin-top:40px;max-width:600px;margin-left:auto;margin-right:auto">
+        <p style="color:var(--text-secondary);font-size:15px;line-height:1.7">
+          If this tool saves you money, use that money better.
+          You're not paying for software — you're choosing how to use your money.
+          That's the idea behind DocPix.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== IMPACT ===== -->
+  <section id="impact">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:60px">
+        <div class="section-label">&#127758; Impact</div>
+        <h2 class="section-title">This is more than a product.<br>It's a choice.</h2>
+        <p class="section-subtitle">
+          Technology should make life easier — not more expensive.
+          DocPix Studio exists to remove unnecessary barriers.
+          Support us, or support someone else.
+        </p>
+      </div>
+
+      <div class="impact-cards">
+        <div class="impact-card reveal reveal-delay-1">
+          <span class="impact-emoji">&#127858;</span>
+          <h4>Feed Someone</h4>
+          <p>Redirect your savings to food and hunger programs in your community.</p>
+        </div>
+        <div class="impact-card reveal reveal-delay-2">
+          <span class="impact-emoji">&#127891;</span>
+          <h4>Sponsor Education</h4>
+          <p>Support a child's education and open doors to their future.</p>
+        </div>
+        <div class="impact-card reveal reveal-delay-3">
+          <span class="impact-emoji">&#128154;</span>
+          <h4>Cancer Research</h4>
+          <p>Contribute to medical breakthroughs and support patients in need.</p>
+        </div>
+        <div class="impact-card reveal reveal-delay-4">
+          <span class="impact-emoji">&#127968;</span>
+          <h4>Help a Family</h4>
+          <p>Support families through difficult times with emergency relief.</p>
+        </div>
+      </div>
+
+      <div class="reveal" style="text-align:center;margin-top:60px;max-width:600px;margin-left:auto;margin-right:auto">
+        <p style="font-size:22px;font-weight:600;margin-bottom:12px">If enough people redirect even a small amount,<br>this becomes bigger than software.</p>
+        <p style="color:var(--text-secondary);font-size:15px;line-height:1.7">
+          You can donate directly to causes you care about, or we can help route your contribution on your behalf.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SEO SECTION ===== -->
+  <section>
+    <div class="container">
+      <div class="seo-section reveal">
+        <h3>Looking for a free PDF editor or a<br>Photoshop alternative?</h3>
+        <p>DocPix Studio helps you edit PDFs without a subscription, replace expensive editing software, and use AI for fast image editing.</p>
+        <div class="seo-tags">
+          <span class="seo-tag">Free PDF Editor</span>
+          <span class="seo-tag">PDF to Word Converter</span>
+          <span class="seo-tag">AI Image Editor</span>
+          <span class="seo-tag">Adobe Alternative</span>
+          <span class="seo-tag">Document Signing</span>
+          <span class="seo-tag">File Compressor</span>
+          <span class="seo-tag">Open Source</span>
+          <span class="seo-tag">No Subscription</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section id="contact">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:60px">
+        <div class="section-label">&#128233; Contact</div>
+        <h2 class="section-title">We'd love to hear from you.</h2>
+        <p class="section-subtitle">Whether it's feedback, ideas, partnerships, or support — reach out.</p>
+      </div>
+
+      <div class="contact-grid reveal">
+        <div class="contact-info">
+          <h3>Get in touch</h3>
+          <p>Built to simplify your work — and maybe make a small difference along the way.</p>
+          <div class="contact-detail">
+            <div class="cd-icon">&#128231;</div>
+            <span>support@docpix.com</span>
+          </div>
+          <div class="contact-detail">
+            <div class="cd-icon">&#127760;</div>
+            <span>docpix.studio</span>
+          </div>
+          <div class="contact-detail">
+            <div class="cd-icon">&#128187;</div>
+            <span>GitHub: VagishKapila</span>
+          </div>
+        </div>
+        <div class="contact-form">
+          <form id="contactForm" onsubmit="handleContactSubmit(event)">
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" placeholder="Your name" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea placeholder="Tell us what's on your mind..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-left">
+        <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
+          <rect x="2" y="2" width="36" height="36" rx="10" fill="url(#logo-grad2)" />
+          <rect x="2" y="2" width="18" height="36" rx="10" fill="white" />
+          <line x1="8" y1="16" x2="16" y2="16" stroke="#4a5568" stroke-width="2" stroke-linecap="round"/>
+          <line x1="8" y1="22" x2="14" y2="22" stroke="#4a5568" stroke-width="2" stroke-linecap="round"/>
+          <polygon points="26,28 32,18 38,28" fill="rgba(255,255,255,0.9)" />
+          <path d="M30 10 L31 13 L34 13 L31.5 15 L32.5 18 L30 16 L27.5 18 L28.5 15 L26 13 L29 13 Z" fill="white" />
+          <defs><linearGradient id="logo-grad2" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
+        </svg>
+        <span style="font-weight:600;font-size:14px">DocPix Studio</span>
+      </div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#product">Product</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#impact">Impact</a>
+        <a href="#contact">Contact</a>
+        <a href="https://github.com/VagishKapila/openpdf-studio" target="_blank">GitHub</a>
+      </div>
+    </div>
+    <div class="footer-copy">
+      &copy; 2026 DocPix Studio. Free and open source. Built with purpose.
+    </div>
+  </footer>
+
+  <script>
+    // ===== NAV SCROLL =====
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // ===== SCROLL REVEAL =====
+    const revealElements = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    revealElements.forEach(el => observer.observe(el));
+
+    // ===== BENTO CARD GLOW FOLLOW =====
+    document.querySelectorAll('.bento-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      });
+    });
+
+    // ===== SMOOTH SCROLL =====
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // ===== CONTACT FORM =====
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.textContent = 'Sent!';
+      btn.style.background = 'linear-gradient(135deg, #22c55e, #4ade80)';
+      setTimeout(() => {
+        btn.textContent = 'Send Message';
+        btn.style.background = '';
+        e.target.reset();
+      }, 3000);
+    }
+
+    // ===== MOBILE MENU =====
+    function toggleMobileMenu() {
+      const links = document.querySelector('.nav-links');
+      if (links.style.display === 'flex') {
+        links.style.display = 'none';
+      } else {
+        links.style.display = 'flex';
+        links.style.flexDirection = 'column';
+        links.style.position = 'fixed';
+        links.style.top = '60px';
+        links.style.left = '0';
+        links.style.right = '0';
+        links.style.background = 'rgba(10,10,15,0.95)';
+        links.style.padding = '20px';
+        links.style.backdropFilter = 'blur(20px)';
+        links.style.borderBottom = '1px solid rgba(255,255,255,0.08)';
+      }
+    }
+
+    // ===== PARALLAX ORBS =====
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          document.querySelectorAll('.floating-orb').forEach((orb, i) => {
+            const speed = 0.02 + i * 0.01;
+            orb.style.transform = `translateY(${scrollY * speed}px)`;
+          });
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  </script>
+</body>
+</html>
