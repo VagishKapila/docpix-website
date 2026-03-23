@@ -1120,7 +1120,7 @@
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#impact">Impact</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li><a href="https://vagishkapila.github.io/openpdf-studio/" class="nav-cta">Launch App</a></li>
+      <li><a href="https://vagishkapila.github.io/openpdf-studio/" class="nav-cta" id="nav-download-btn">Download for <span id="nav-os-name">your device</span></a></li>
     </ul>
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">&#9776;</button>
   </nav>
@@ -1143,8 +1143,8 @@
             No subscriptions. No complexity. Just works.
           </p>
           <div class="hero-actions">
-            <a href="https://vagishkapila.github.io/openpdf-studio/" class="btn btn-primary">
-              <span>&#9889;</span> Start Editing — Free
+            <a href="https://vagishkapila.github.io/openpdf-studio/" class="btn btn-primary" id="hero-download-btn">
+              <span id="hero-os-icon">&#9889;</span> Download for <span id="hero-os-name">Free</span>
             </a>
             <a href="#features" class="btn btn-secondary">
               See Features
@@ -1758,6 +1758,39 @@
         ticking = true;
       }
     });
+
+    // OS Auto-Detection for Download buttons
+    (function() {
+      const ua = navigator.userAgent.toLowerCase();
+      let osName = 'Free';
+      let osIcon = '\u26A1'; // lightning bolt default
+      if (ua.includes('mac')) {
+        osName = 'Mac';
+        osIcon = '\uD83C\uDF4E'; // apple emoji
+      } else if (ua.includes('win')) {
+        osName = 'Windows';
+        osIcon = '\uD83D\uDDA5\uFE0F'; // desktop emoji
+      } else if (ua.includes('linux')) {
+        osName = 'Linux';
+        osIcon = '\uD83D\uDC27'; // penguin emoji
+      } else if (ua.includes('android')) {
+        osName = 'Android';
+        osIcon = '\uD83D\uDCF1'; // phone emoji
+      } else if (ua.includes('iphone') || ua.includes('ipad')) {
+        osName = 'iOS';
+        osIcon = '\uD83C\uDF4E'; // apple emoji
+      }
+
+      // Update nav download button
+      const navOs = document.getElementById('nav-os-name');
+      if (navOs) navOs.textContent = osName;
+
+      // Update hero download button
+      const heroOs = document.getElementById('hero-os-name');
+      const heroIcon = document.getElementById('hero-os-icon');
+      if (heroOs) heroOs.textContent = osName;
+      if (heroIcon) heroIcon.textContent = osIcon;
+    })();
   </script>
 </body>
 </html>
