@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vagishkapila.github.io/docpix-website/sitemap.xml

@@ -3,9 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DocPix Studio — The Free Alternative to Expensive Editing Tools</title>
-  <meta name="description" content="Edit PDFs, images, and documents in one place. No subscriptions. No complexity. Powered by AI. Free forever.">
-  <meta name="keywords" content="free PDF editor, Photoshop alternative, AI image editing, document editor, PDF converter, free document signing">
+  <title>DocPix Studio — Free PDF Editor, Image Editor & Document Tool | No Subscription</title>
+  <meta name="description" content="DocPix Studio is the free, open-source alternative to Adobe Acrobat Pro and Photoshop. Edit PDFs, images, and documents in one place. AI-powered OCR, redaction, compression. No subscriptions. No complexity. Free forever.">
+  <meta name="keywords" content="free PDF editor, Photoshop alternative, AI image editing, document editor, PDF converter, free document signing, open source PDF, Adobe Acrobat alternative, free image editor, DocPix Studio, PDF compress, PDF merge, OCR free">
+  <meta name="author" content="Vagish Kapila">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://varshyl.com/docpix-studio">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://varshyl.com/docpix-studio">
+  <meta property="og:title" content="DocPix Studio — Free PDF Editor, Image Editor & Document Tool">
+  <meta property="og:description" content="Edit PDFs, images, and documents in one place. Free, open-source alternative to Adobe Acrobat Pro. AI-powered OCR, redaction, and compression. No subscriptions ever.">
+  <meta property="og:image" content="https://vagishkapila.github.io/docpix-website/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DocPix Studio">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DocPix Studio — Free PDF Editor, Image Editor & Document Tool">
+  <meta name="twitter:description" content="Free, open-source alternative to Adobe Acrobat Pro. Edit PDFs, images & docs with AI-powered tools. No subscriptions ever.">
+  <meta name="twitter:image" content="https://vagishkapila.github.io/docpix-website/og-image.png">
+  <meta name="twitter:creator" content="@VagishKapila">
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="apple-mobile-web-app-title" content="DocPix Studio">
+  <meta name="application-name" content="DocPix Studio">
+  <link rel="alternate" hreflang="en" href="https://varshyl.com/docpix-studio">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "DocPix Studio",
+    "url": "https://varshyl.com/docpix-studio",
+    "description": "Free, open-source PDF editor, image editor, and document tool. AI-powered OCR, redaction, compression. Alternative to Adobe Acrobat Pro.",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web, Windows, macOS, Linux",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Vagish Kapila",
+      "url": "https://varshyl.com"
+    },
+    "softwareVersion": "1.0",
+    "downloadUrl": "https://github.com/VagishKapila/openpdf-studio",
+    "screenshot": "https://vagishkapila.github.io/docpix-website/og-image.png",
+    "featureList": "PDF editing, Image editing, AI OCR, AI Redaction, PDF compression, Document signing, Watermarks, Annotations, PDF merge, PDF convert",
+    "isAccessibleForFree": true,
+    "license": "https://opensource.org/licenses/MIT"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "DocPix Studio",
+    "url": "https://varshyl.com/docpix-studio",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://varshyl.com/docpix-studio?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "DocPix Studio",
+    "url": "https://varshyl.com/docpix-studio",
+    "logo": "https://vagishkapila.github.io/docpix-website/og-image.png",
+    "sameAs": [
+      "https://github.com/VagishKapila/openpdf-studio"
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -163,6 +247,22 @@
       box-shadow: 0 4px 20px var(--primary-glow);
     }
     .nav-cta::after { display: none !important; }
+
+    .nav-cta-secondary {
+      border: 2px solid var(--primary) !important;
+      color: var(--primary) !important;
+      padding: 6px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+      background: transparent !important;
+    }
+    .nav-cta-secondary:hover {
+      background: var(--primary) !important;
+      color: white !important;
+    }
+    .nav-cta-secondary::after { display: none !important; }
 
     .mobile-menu-btn {
       display: none;
@@ -1120,7 +1220,8 @@
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#impact">Impact</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li><a href="https://vagishkapila.github.io/openpdf-studio/" class="nav-cta" id="nav-download-btn">Download for <span id="nav-os-name">your device</span></a></li>
+      <li><a href="https://varshyl.com/docpix-studio" class="nav-cta-secondary">Try on Web</a></li>
+      <li><a href="https://github.com/VagishKapila/openpdf-studio" class="nav-cta" id="nav-download-btn">Download for <span id="nav-os-name">your device</span></a></li>
     </ul>
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">&#9776;</button>
   </nav>
@@ -1143,11 +1244,11 @@
             No subscriptions. No complexity. Just works.
           </p>
           <div class="hero-actions">
-            <a href="https://vagishkapila.github.io/openpdf-studio/" class="btn btn-primary" id="hero-download-btn">
+            <a href="https://github.com/VagishKapila/openpdf-studio" class="btn btn-primary" id="hero-download-btn">
               <span id="hero-os-icon">&#9889;</span> Download for <span id="hero-os-name">Free</span>
             </a>
-            <a href="#features" class="btn btn-secondary">
-              See Features
+            <a href="https://varshyl.com/docpix-studio" class="btn btn-secondary">
+              &#127760; Try on Web
             </a>
           </div>
         </div>
@@ -1488,7 +1589,7 @@
             <li><span class="pf-check">&#10003;</span> Document signing</li>
             <li><span class="pf-check">&#10003;</span> No limits</li>
           </ul>
-          <a href="https://vagishkapila.github.io/openpdf-studio/" class="btn btn-primary" style="width:100%;justify-content:center">Start Free</a>
+          <a href="https://varshyl.com/docpix-studio" class="btn btn-primary" style="width:100%;justify-content:center">Start Free</a>
         </div>
 
         <div class="price-card featured reveal reveal-delay-2">
