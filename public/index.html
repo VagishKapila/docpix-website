@@ -1221,7 +1221,7 @@
       <li><a href="#impact">Impact</a></li>
       <li><a href="#contact">Contact</a></li>
       <li><a href="https://varshyl.com/dpstudio" class="nav-cta-secondary">Try on Web</a></li>
-      <li><a href="https://github.com/VagishKapila/openpdf-studio" class="nav-cta" id="nav-download-btn">Download for <span id="nav-os-name">your device</span></a></li>
+      <li><a href="https://github.com/VagishKapila/openpdf-studio" class="nav-cta" id="nav-download-btn">Download Free</a></li>
     </ul>
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">&#9776;</button>
   </nav>
@@ -1251,6 +1251,15 @@
               &#127760; Try on Web
             </a>
           </div>
+          <p class="hero-platforms" style="margin-top:12px;font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">
+            Available for
+            <span style="display:inline-flex;gap:6px;align-items:center;">
+              <span style="background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:6px;font-size:12px;">&#127822; Mac</span>
+              <span style="background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:6px;font-size:12px;">&#128421;&#65039; Windows</span>
+              <span style="background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:6px;font-size:12px;">&#128039; Linux</span>
+              <span style="background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:6px;font-size:12px;">&#127760; Web</span>
+            </span>
+          </p>
         </div>
         <div class="hero-visual">
           <div class="mockup-container">
@@ -1881,10 +1890,6 @@
         osName = 'iOS';
         osIcon = '\uD83C\uDF4E'; // apple emoji
       }
-
-      // Update nav download button
-      const navOs = document.getElementById('nav-os-name');
-      if (navOs) navOs.textContent = osName;
 
       // Update hero download button
       const heroOs = document.getElementById('hero-os-name');
